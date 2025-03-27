@@ -31,11 +31,7 @@ export default function Chat() {
     const input = new FormData(e.currentTarget).get('message') as string;
     if (!input.trim()) return;
 
-    const newMessage: Message = {
-      role: 'user',
-      content: input,
-    };
-
+    const newMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, newMessage]);
     e.currentTarget.reset();
 
@@ -50,45 +46,40 @@ export default function Chat() {
     setMessages((prev) => [
       ...prev,
       { role: 'user', content: `Uploaded file: ${file.name}` },
-      {
-        role: 'assistant',
-        content: `Thanks! I’ve received the file **${file.name}**. I’ll analyze it shortly.`,
-      },
+      { role: 'assistant', content: `Thanks! I've received **${file.name}**. I'll analyze it shortly.` },
     ]);
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-zinc-950 font-sans text-sm text-zinc-900 dark:text-white">
-      {/* Top Nav */}
-      <div className="w-full border-b border-zinc-200 dark:border-zinc-800 px-6 py-3 flex items-center justify-between bg-zinc-50 dark:bg-zinc-900 shadow-sm sticky top-0 z-10">
-        <div className="text-lg font-semibold text-purple-600">TaxBot</div>
-        <div className="flex-1 mx-4 max-w-lg">
-          <input
-            type="text"
-            placeholder="Search chats"
-            className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+    <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex flex-col h-[90vh] w-full max-w-2xl bg-white dark:bg-gray-800 shadow-lg rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        {/* Top Bar */}
+        <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 flex justify-between items-center border-b border-gray-200 dark:border-gray-600">
+          <div className="text-lg font-semibold text-purple-600">TaxBot</div>
+          <div className="flex items-center gap-4">
+            <input
+              type="text"
+              placeholder="Search"
+              className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 text-sm focus:outline-none"
+            />
+            <button className="text-gray-500 hover:text-purple-600">🔗</button>
+            <button className="text-gray-500 hover:text-purple-600">👤</button>
+          </div>
         </div>
-        <div className="flex gap-3">
-          <button className="text-zinc-500 hover:text-purple-600 transition">🔗 Share</button>
-          <button className="text-zinc-500 hover:text-purple-600 transition">👤 Profile</button>
-        </div>
-      </div>
 
-      {/* Chat Area */}
-      <div className="flex-1 px-6 py-4 space-y-4 overflow-y-auto">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`p-4 rounded-lg max-w-[75%] whitespace-pre-wrap shadow-sm ${
-              m.role === 'user'
-                ? 'bg-gradient-to-br from-purple-600 to-purple-500 text-white self-end ml-auto'
-                : 'bg-zinc-100 dark:bg-zinc-800 text-black dark:text-white self-start'
-            }`}
-          >
-            {m.content === 'SHOW_CHART' ? (
-              <div className="w-full h-64">
-                <ResponsiveContainer width="100%" height="100%">
+        {/* Chat Area */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 flex flex-col">
+          {messages.map((m, i) => (
+            <div
+              key={i}
+              className={`p-3 rounded-xl shadow-sm max-w-max ${
+                m.role === 'user'
+                  ? 'bg-purple-600 text-white self-end text-right'
+                  : 'bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-gray-100 self-start text-left'
+              }`}
+            >
+              {m.content === 'SHOW_CHART' ? (
+                <ResponsiveContainer width="100%" height={200}>
                   <BarChart
                     data={[
                       { name: 'Income', amount: 80000 },
@@ -100,48 +91,38 @@ export default function Chat() {
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="amount" fill="#a78bfa" />
+                    <Bar dataKey="amount" fill="#8884d8" />
                   </BarChart>
                 </ResponsiveContainer>
-              </div>
-            ) : m.content.includes('<table') ? (
-              <div dangerouslySetInnerHTML={{ __html: m.content }} />
-            ) : (
-              m.content
-            )}
-          </div>
-        ))}
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Input Bar */}
-      <form
-        onSubmit={handleSubmit}
-        className="sticky bottom-0 px-6 py-4 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800"
-      >
-        <input
-          name="message"
-          placeholder="Ask about taxes…"
-          className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-        />
-
-        <div className="mt-2 flex justify-between items-center">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="text-sm text-purple-600 hover:text-purple-800 dark:hover:text-purple-400 font-medium transition"
-          >
-            Upload a file
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="hidden"
-            onChange={handleFileUpload}
-            accept=".pdf,.png,.jpg,.jpeg"
-          />
+              ) : m.content.includes('<table') ? (
+                <div dangerouslySetInnerHTML={{ __html: m.content }} />
+              ) : (
+                m.content
+              )}
+            </div>
+          ))}
+          <div ref={bottomRef} />
         </div>
-      </form>
+
+        {/* Input Area */}
+        <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-600">
+          <input
+            name="message"
+            placeholder="Type your question here..."
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-500 bg-gray-50 dark:bg-gray-700 focus:outline-none"
+          />
+          <div className="mt-2 flex justify-between">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="text-purple-600 hover:underline"
+            >
+              📎 Attach file
+            </button>
+            <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
